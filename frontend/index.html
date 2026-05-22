@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3 Store</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <a class="nav-brand" href="index.html">⬡ Web3 Store</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Store</a></li>
+    <li><a href="faucet.html">Faucet</a></li>
+    <li><a href="nft.html">NFT Mint</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="wallet-address"></span>
+    <button id="connect-btn" class="btn btn-outline btn-sm">Connect Wallet</button>
+  </div>
+</nav>
+
+<main>
+  <!-- Low-balance banner -->
+  <div id="low-balance-banner" class="alert alert-warning hidden" style="margin-bottom:1.5rem">
+    Your wallet balance is low.
+    <a href="faucet.html" style="color:inherit;font-weight:700">Visit the Faucet</a>
+    to get free test ETH on Sepolia.
+  </div>
+
+  <!-- Header -->
+  <div style="margin-bottom:2rem">
+    <h1 class="page-title">Digital Products</h1>
+    <p class="page-subtitle">
+      Pay with ETH on Sepolia. Connect MetaMask, then click Buy Now.
+    </p>
+  </div>
+
+  <!-- How it works -->
+  <div class="card mb-3" style="display:flex;gap:2rem;flex-wrap:wrap">
+    <div style="flex:1;min-width:180px">
+      <div style="font-size:1.4rem;margin-bottom:0.3rem">1️⃣</div>
+      <strong>Connect Wallet</strong>
+      <p class="text-muted" style="font-size:0.84rem;margin-top:0.3rem">
+        Click "Connect Wallet" in the top-right and approve MetaMask.
+      </p>
+    </div>
+    <div style="flex:1;min-width:180px">
+      <div style="font-size:1.4rem;margin-bottom:0.3rem">2️⃣</div>
+      <strong>Get Test ETH</strong>
+      <p class="text-muted" style="font-size:0.84rem;margin-top:0.3rem">
+        Need funds? Visit the <a href="faucet.html" class="text-accent">Faucet</a> to receive 0.01 ETH.
+      </p>
+    </div>
+    <div style="flex:1;min-width:180px">
+      <div style="font-size:1.4rem;margin-bottom:0.3rem">3️⃣</div>
+      <strong>Buy a Product</strong>
+      <p class="text-muted" style="font-size:0.84rem;margin-top:0.3rem">
+        Click "Buy Now", confirm the ETH transfer in MetaMask, and receive a receipt.
+      </p>
+    </div>
+    <div style="flex:1;min-width:180px">
+      <div style="font-size:1.4rem;margin-bottom:0.3rem">4️⃣</div>
+      <strong>NFT Certificate</strong>
+      <p class="text-muted" style="font-size:0.84rem;margin-top:0.3rem">
+        The store owner can mint you an NFT certificate from the <a href="nft.html" class="text-accent">NFT page</a>.
+      </p>
+    </div>
+  </div>
+
+  <!-- Product grid -->
+  <div id="product-grid" class="product-grid"></div>
+</main>
+
+<script type="module" src="js/store.js"></script>
+</body>
+</html>

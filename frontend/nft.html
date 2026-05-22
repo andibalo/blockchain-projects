@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFT Mint — Web3 Store</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <a class="nav-brand" href="index.html">⬡ Web3 Store</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Store</a></li>
+    <li><a href="faucet.html">Faucet</a></li>
+    <li><a href="nft.html" class="active">NFT Mint</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="wallet-address"></span>
+    <button id="connect-btn" class="btn btn-outline btn-sm">Connect Wallet</button>
+  </div>
+</nav>
+
+<main>
+  <h1 class="page-title">NFT Certificate Mint</h1>
+  <p class="page-subtitle">
+    Mint an ERC-721 NFT as a purchase certificate. Only the contract owner can mint.
+  </p>
+
+  <!-- Status message -->
+  <div id="status-msg" class="alert alert-info hidden"></div>
+
+  <!-- Non-owner message -->
+  <div id="not-owner-msg" class="alert alert-warning hidden">
+    Only the contract owner can mint NFTs. Connect the owner wallet to access this page.
+  </div>
+
+  <div class="two-col">
+    <!-- Mint form — visible to owner only -->
+    <div id="owner-panel" class="card hidden">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.2rem">
+        <h2>Mint NFT</h2>
+        <span class="badge badge-green">Owner</span>
+      </div>
+
+      <div class="form-group">
+        <label for="recipient-address">Recipient Address</label>
+        <input
+          id="recipient-address"
+          type="text"
+          placeholder="0x..."
+          spellcheck="false"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="token-uri">Token URI</label>
+        <input
+          id="token-uri"
+          type="text"
+          placeholder="ipfs://Qm... or https://..."
+          spellcheck="false"
+        />
+        <div class="text-muted mt-1" style="font-size:0.78rem">
+          Metadata JSON URL. Must include "name", "description", "image" fields.
+        </div>
+      </div>
+
+      <button id="mint-btn" class="btn btn-primary btn-full">Mint NFT</button>
+
+      <div id="mint-result" class="mt-2 hidden"></div>
+    </div>
+
+    <!-- About the NFT contract -->
+    <div class="card">
+      <h2 style="margin-bottom:1rem">About SimpleNFT</h2>
+
+      <div class="stats-row" style="margin-bottom:1.2rem">
+        <div class="stat-box">
+          <div class="stat-label">Name</div>
+          <div class="stat-value" id="nft-name" style="font-size:1.1rem">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Symbol</div>
+          <div class="stat-value" id="nft-symbol" style="font-size:1.1rem">—</div>
+        </div>
+      </div>
+
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:0.8rem">
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">ERC-721</span>
+          Follows the OpenZeppelin ERC-721 URIStorage standard.
+        </li>
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">Web3 API</span>
+          Calls <code>mintNFT(address, tokenUri)</code> via ethers.js.
+        </li>
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">Owner-only</span>
+          Only the deployer wallet can mint — enforced by <code>onlyOwner</code> modifier.
+        </li>
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">Token ID</span>
+          Auto-increments from 1. Returned from the Transfer event in the tx receipt.
+        </li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3 style="margin-bottom:0.8rem">Contract Interface (Web3 API calls)</h3>
+      <div style="display:flex;flex-direction:column;gap:0.6rem">
+        <div style="background:var(--bg);border-radius:8px;padding:0.7rem;border:1px solid var(--border)">
+          <div class="badge badge-purple mb-1">write · onlyOwner</div>
+          <div class="font-mono" style="font-size:0.85rem">mintNFT(address to, string tokenUri)</div>
+          <div class="text-muted" style="font-size:0.78rem;margin-top:0.2rem">
+            Mints token to recipient, stores metadata URI, returns token ID
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.7rem;border:1px solid var(--border)">
+          <div class="badge badge-green mb-1">view</div>
+          <div class="font-mono" style="font-size:0.85rem">tokenURI(uint256 tokenId)</div>
+          <div class="text-muted" style="font-size:0.78rem;margin-top:0.2rem">
+            Returns the metadata URI for a given token
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.7rem;border:1px solid var(--border)">
+          <div class="badge badge-green mb-1">view</div>
+          <div class="font-mono" style="font-size:0.85rem">ownerOf(uint256 tokenId)</div>
+          <div class="text-muted" style="font-size:0.78rem;margin-top:0.2rem">
+            Returns the owner address of a token
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Token URI format guide -->
+  <div class="card" style="margin-top:1.5rem">
+    <h3 style="margin-bottom:0.8rem">Token URI Format</h3>
+    <p class="text-muted mb-2" style="font-size:0.88rem">
+      The token URI should point to a JSON file with this structure:
+    </p>
+    <pre style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem;font-size:0.82rem;overflow-x:auto;color:var(--text-muted)">{
+  "name": "Digital Art Pack Certificate",
+  "description": "Purchase certificate for Digital Art Pack",
+  "image": "ipfs://QmYourImageHash",
+  "attributes": [
+    { "trait_type": "Product",  "value": "Digital Art Pack" },
+    { "trait_type": "Price",    "value": "0.005 ETH" },
+    { "trait_type": "Network",  "value": "Sepolia" }
+  ]
+}</pre>
+    <p class="text-muted mt-1" style="font-size:0.82rem">
+      You can host this JSON on <a href="https://nft.storage" target="_blank" class="text-accent" rel="noopener">nft.storage</a>
+      or <a href="https://pinata.cloud" target="_blank" class="text-accent" rel="noopener">Pinata</a> for free.
+    </p>
+  </div>
+</main>
+
+<script type="module" src="js/nft.js"></script>
+</body>
+</html>

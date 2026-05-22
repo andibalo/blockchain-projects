@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faucet — Web3 Store</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <a class="nav-brand" href="index.html">⬡ Web3 Store</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Store</a></li>
+    <li><a href="faucet.html" class="active">Faucet</a></li>
+    <li><a href="nft.html">NFT Mint</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="wallet-address"></span>
+    <button id="connect-btn" class="btn btn-outline btn-sm">Connect Wallet</button>
+  </div>
+</nav>
+
+<main>
+  <h1 class="page-title">Sepolia Faucet</h1>
+  <p class="page-subtitle">
+    Receive 0.01 test ETH once every 24 hours. Used to pay for products in the store.
+  </p>
+
+  <!-- Status message -->
+  <div id="status-msg" class="alert alert-info hidden"></div>
+
+  <!-- Stats row -->
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-label">Faucet Balance</div>
+      <div class="stat-value" id="faucet-balance">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Drip Amount</div>
+      <div class="stat-value" id="drip-amount">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Your Cooldown</div>
+      <div class="stat-value" id="cooldown-display" style="font-size:1.1rem">Connect wallet</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Request funds card -->
+    <div class="card">
+      <h2 style="margin-bottom:0.5rem">Request Test ETH</h2>
+      <p class="text-muted mb-3" style="font-size:0.88rem">
+        Connect your MetaMask wallet and click the button. ETH will be sent to your address automatically.
+        You can request once per 24 hours.
+      </p>
+      <button id="request-btn" class="btn btn-primary btn-full">
+        Request Test ETH
+      </button>
+      <div id="tx-receipt" class="tx-receipt mt-2 hidden"></div>
+    </div>
+
+    <!-- How it works card -->
+    <div class="card">
+      <h2 style="margin-bottom:1rem">How the Faucet Works</h2>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:0.8rem">
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">Smart Contract</span>
+          The Faucet is a Solidity contract deployed on Sepolia.
+        </li>
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">Web3 API</span>
+          The website calls <code>requestFunds()</code> via ethers.js — MetaMask signs the transaction.
+        </li>
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">Cooldown</span>
+          A 24-hour cooldown per wallet is enforced on-chain — it cannot be bypassed.
+        </li>
+        <li>
+          <span class="badge badge-purple" style="margin-right:0.5rem">Balance</span>
+          The contract must have ETH to send. The owner deposits ETH to refill it.
+        </li>
+      </ul>
+
+      <hr class="divider" />
+
+      <!-- Owner deposit — hidden until owner connects -->
+      <div id="owner-panel" class="hidden">
+        <h3 style="margin-bottom:0.8rem">Owner: Deposit ETH</h3>
+        <div class="form-group">
+          <label for="deposit-amount">Amount (ETH)</label>
+          <input id="deposit-amount" type="number" min="0.001" step="0.001" placeholder="e.g. 0.1" />
+        </div>
+        <button id="deposit-btn" class="btn btn-success btn-full">Deposit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contract info -->
+  <div class="card mt-2" style="margin-top:1.5rem">
+    <h3 style="margin-bottom:0.8rem">Contract Interface (Web3 API calls)</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem">
+      <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+        <div class="badge badge-green mb-1">view</div>
+        <div class="font-mono" style="font-size:0.85rem">getBalance()</div>
+        <div class="text-muted" style="font-size:0.78rem">Returns ETH balance of the faucet</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+        <div class="badge badge-green mb-1">view</div>
+        <div class="font-mono" style="font-size:0.85rem">DRIP_AMOUNT()</div>
+        <div class="text-muted" style="font-size:0.78rem">Fixed 0.01 ETH per request</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+        <div class="badge badge-purple mb-1">write</div>
+        <div class="font-mono" style="font-size:0.85rem">requestFunds()</div>
+        <div class="text-muted" style="font-size:0.78rem">Sends 0.01 ETH to caller</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+        <div class="badge badge-purple mb-1">payable</div>
+        <div class="font-mono" style="font-size:0.85rem">deposit()</div>
+        <div class="text-muted" style="font-size:0.78rem">Adds ETH to faucet balance</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module" src="js/faucet.js"></script>
+</body>
+</html>
