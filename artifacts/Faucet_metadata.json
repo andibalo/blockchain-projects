@@ -198,11 +198,11 @@
 	},
 	"sources": {
 		"contracts/4_Faucet.sol": {
-			"keccak256": "0xd504bced6cc4d53fe7923a894435d7dbf2e4d1e3914aea5cc5579c510e8a4fd4",
+			"keccak256": "0xc0d903ba7951bb6ec62c44b84861005f812c0a4fecea871e755563c2163ab0c3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://74d94ea3a7334f635966df9f00aef038d73694d0adcbe5dcc04890306d384a64",
-				"dweb:/ipfs/QmPGcXpY6ccd2gxPiH2XTM3u8oZRh3pTkRpoXz52b3rHQo"
+				"bzz-raw://87493139a584f6ef29732755bf08cda63440d099da010753f0769485031d177c",
+				"dweb:/ipfs/Qmbuh7Ew2o3AJXav91ZevdyvaJpZoUrzuFwQED33FJrEfZ"
 			]
 		}
 	},

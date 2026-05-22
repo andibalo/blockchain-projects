@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity ^0.8.20;
 
 contract Faucet {
     address public owner;
@@ -34,14 +34,16 @@ contract Faucet {
         require(address(this).balance >= DRIP_AMOUNT, "Faucet empty");
 
         nextRequestAt[msg.sender] = block.timestamp + COOLDOWN;
-        payable(msg.sender).transfer(DRIP_AMOUNT);
+        (bool ok, ) = payable(msg.sender).call{value: DRIP_AMOUNT}("");
+        require(ok, "Transfer failed");
 
         emit FundsSent(msg.sender, DRIP_AMOUNT);
     }
 
     function ownerWithdraw(uint256 amount) external onlyOwner {
         require(amount <= address(this).balance, "Insufficient balance");
-        payable(owner).transfer(amount);
+        (bool ok, ) = payable(owner).call{value: amount}("");
+        require(ok, "Withdraw failed");
         emit OwnerWithdrawn(owner, amount);
     }
 
