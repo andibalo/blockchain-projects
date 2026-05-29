@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 contract Faucet {
-    address public owner;
+    address public immutable owner;
     uint256 public constant DRIP_AMOUNT = 0.01 ether;
     uint256 public constant COOLDOWN = 1 days;
 
@@ -30,10 +30,13 @@ contract Faucet {
     }
 
     function requestFunds() external {
-        require(block.timestamp >= nextRequestAt[msg.sender], "Try later");
+        uint256 nextAt = nextRequestAt[msg.sender];
+        require(block.timestamp >= nextAt, "Try later");
         require(address(this).balance >= DRIP_AMOUNT, "Faucet empty");
 
-        nextRequestAt[msg.sender] = block.timestamp + COOLDOWN;
+        unchecked {
+            nextRequestAt[msg.sender] = block.timestamp + COOLDOWN;
+        }
         (bool ok, ) = payable(msg.sender).call{value: DRIP_AMOUNT}("");
         require(ok, "Transfer failed");
 

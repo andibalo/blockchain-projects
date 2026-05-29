@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Benchmark — Web3 Store</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .progress-track {
+      background: var(--border);
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      margin-bottom: 0.4rem;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+    #live-log {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      height: 180px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    td { font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <a class="nav-brand" href="index.html">⬡ Web3 Store</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Store</a></li>
+    <li><a href="faucet.html">Faucet</a></li>
+    <li><a href="nft.html">NFT Mint</a></li>
+    <li><a href="benchmark.html" class="active">Benchmark</a></li>
+  </ul>
+  <div class="nav-right"></div>
+</nav>
+
+<main>
+  <h1 class="page-title">Simulation &amp; Throughput Benchmark</h1>
+  <p class="page-subtitle">
+    Runs 20 sequential read calls against the deployed Sepolia contracts and measures throughput.
+    No MetaMask or gas needed — read calls are free.
+  </p>
+
+  <div class="two-col" style="margin-bottom:1.5rem">
+    <!-- Run panel -->
+    <div class="card">
+      <h2 style="margin-bottom:0.8rem">Run Simulation</h2>
+      <p class="text-muted mb-3" style="font-size:0.88rem">
+        Fires <strong>20 contract calls</strong> in sequence against your deployed Faucet
+        and SimpleNFT contracts on Sepolia. Measures latency and calculates calls/second.
+      </p>
+
+      <button id="run-btn" class="btn btn-primary btn-full">Run Simulation</button>
+
+      <div style="margin-top:1.2rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-muted);margin-bottom:0.3rem">
+          <span>Progress</span>
+          <span id="progress-label">0%</span>
+        </div>
+        <div class="progress-track"><div id="progress-bar"></div></div>
+      </div>
+
+      <div style="margin-top:1rem">
+        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:0.4rem">Live Log</div>
+        <div id="live-log"></div>
+      </div>
+    </div>
+
+    <!-- What is being tested -->
+    <div class="card">
+      <h2 style="margin-bottom:1rem">What is Being Simulated</h2>
+      <p class="text-muted mb-2" style="font-size:0.88rem">
+        Each round cycles through these 5 contract read calls:
+      </p>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.2rem">
+        <div style="background:var(--bg);border-radius:8px;padding:0.6rem 0.9rem;border:1px solid var(--border);font-family:monospace;font-size:0.82rem">
+          <span class="badge badge-green" style="margin-right:0.5rem">Faucet</span>getBalance()
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.6rem 0.9rem;border:1px solid var(--border);font-family:monospace;font-size:0.82rem">
+          <span class="badge badge-green" style="margin-right:0.5rem">Faucet</span>DRIP_AMOUNT()
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.6rem 0.9rem;border:1px solid var(--border);font-family:monospace;font-size:0.82rem">
+          <span class="badge badge-green" style="margin-right:0.5rem">Faucet</span>owner()
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.6rem 0.9rem;border:1px solid var(--border);font-family:monospace;font-size:0.82rem">
+          <span class="badge badge-purple" style="margin-right:0.5rem">NFT</span>name()
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.6rem 0.9rem;border:1px solid var(--border);font-family:monospace;font-size:0.82rem">
+          <span class="badge badge-purple" style="margin-right:0.5rem">NFT</span>symbol()
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <h3 style="margin-bottom:0.6rem">How Throughput is Calculated</h3>
+      <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border);font-family:monospace;font-size:0.84rem;color:var(--text-muted)">
+        throughput = successful_calls ÷ total_seconds
+      </div>
+      <p class="text-muted mt-1" style="font-size:0.82rem">
+        Higher calls/sec = faster RPC response = better system throughput.
+      </p>
+    </div>
+  </div>
+
+  <!-- Results section (hidden until simulation runs) -->
+  <div id="results-section" class="hidden">
+
+    <!-- Summary stats -->
+    <h2 style="margin-bottom:1rem">Results</h2>
+    <div class="stats-row" style="margin-bottom:1.5rem">
+      <div class="stat-box">
+        <div class="stat-label">Total Calls</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Successful</div>
+        <div class="stat-value text-success" id="stat-success">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Total Time</div>
+        <div class="stat-value" id="stat-total-time" style="font-size:1.1rem">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Avg Latency</div>
+        <div class="stat-value" id="stat-avg" style="font-size:1.1rem">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Min Latency</div>
+        <div class="stat-value text-success" id="stat-min" style="font-size:1.1rem">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Max Latency</div>
+        <div class="stat-value text-error" id="stat-max" style="font-size:1.1rem">—</div>
+      </div>
+    </div>
+
+    <!-- Throughput highlight -->
+    <div class="card mb-3" style="text-align:center;padding:2rem;margin-bottom:1.5rem;border-color:var(--accent)">
+      <div style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.5rem">
+        Measured Throughput
+      </div>
+      <div id="stat-throughput" style="font-size:3rem;font-weight:700;color:var(--accent)">—</div>
+    </div>
+
+    <!-- Per-call table -->
+    <div class="card">
+      <h3 style="margin-bottom:1rem">Per-Call Breakdown</h3>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Function Called</th>
+              <th>Latency</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="results-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Gas Comparison Section ── -->
+  <div style="margin-top:2rem">
+    <h2 style="margin-bottom:0.4rem">Gas Optimization Comparison</h2>
+    <p class="page-subtitle" style="margin-bottom:1.2rem">
+      Compares gas cost before and after the smart contract optimizations.
+      The <span class="badge badge-green">LIVE</span> row is measured from your deployed contract via <code>estimateGas()</code>.
+      Other rows show theoretical savings calculated from EVM opcode costs.
+    </p>
+
+    <div class="card mb-3" style="margin-bottom:1.5rem">
+      <h3 style="margin-bottom:0.8rem">What Was Optimized</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem">
+        <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+          <div class="badge badge-purple mb-1">Faucet</div>
+          <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.3rem"><code>owner</code> → <code>immutable</code></div>
+          <div class="text-muted" style="font-size:0.78rem">Saves ~2,100 gas — reads bytecode instead of storage (SLOAD)</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+          <div class="badge badge-purple mb-1">Faucet</div>
+          <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.3rem">Cache mapping read</div>
+          <div class="text-muted" style="font-size:0.78rem">Saves ~100 gas — avoids second SLOAD for <code>nextRequestAt</code></div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+          <div class="badge badge-purple mb-1">Faucet</div>
+          <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.3rem"><code>unchecked</code> timestamp</div>
+          <div class="text-muted" style="font-size:0.78rem">Saves ~20 gas — skips overflow check on timestamp addition</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+          <div class="badge badge-green mb-1">SimpleNFT</div>
+          <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.3rem"><code>calldata</code> for tokenUri</div>
+          <div class="text-muted" style="font-size:0.78rem">Saves ~300 gas — avoids copying string from calldata to memory</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:0.8rem;border:1px solid var(--border)">
+          <div class="badge badge-green mb-1">SimpleNFT</div>
+          <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.3rem"><code>unchecked</code> token increment</div>
+          <div class="text-muted" style="font-size:0.78rem">Saves ~20 gas — skips overflow check on counter increment</div>
+        </div>
+      </div>
+    </div>
+
+    <button id="gas-btn" class="btn btn-primary" style="margin-bottom:1.2rem">Run Gas Comparison</button>
+    <div id="gas-error" class="alert alert-error hidden"></div>
+
+    <div id="gas-results" class="card hidden">
+      <h3 style="margin-bottom:1rem">Before vs After Gas Usage</h3>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Function</th>
+              <th>Before (gas)</th>
+              <th>After (gas)</th>
+              <th>Saved</th>
+              <th>% Reduction</th>
+              <th>Optimization Applied</th>
+            </tr>
+          </thead>
+          <tbody id="gas-tbody"></tbody>
+        </table>
+      </div>
+      <p class="text-muted mt-2" style="font-size:0.78rem">
+        * Before values are calculated from EVM opcode costs (cold SLOAD = 2,100 gas, warm SLOAD = 100 gas, unchecked ≈ 20 gas, calldata vs memory ≈ 300 gas).
+        The <span class="badge badge-green" style="font-size:0.68rem">LIVE</span> row is a real measurement from your deployed contract.
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<script type="module" src="js/benchmark.js"></script>
+</body>
+</html>
